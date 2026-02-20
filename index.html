@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoTracker - Real-Time Cryptocurrency Prices</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <h1>CryptoTracker</h1>
+                </div>
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Last Updated</span>
+                        <span class="stat-value" id="lastUpdated">--:--:--</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Total Market Cap</span>
+                        <span class="stat-value" id="totalMarketCap">$--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Search and Controls -->
+            <div class="controls">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search cryptocurrencies...">
+                </div>
+                <div class="filter-controls">
+                    <select id="sortSelect" class="sort-select">
+                        <option value="market_cap_desc">Sort by Market Cap ↓</option>
+                        <option value="market_cap_asc">Sort by Market Cap ↑</option>
+                        <option value="price_desc">Sort by Price ↓</option>
+                        <option value="price_asc">Sort by Price ↑</option>
+                        <option value="name_asc">Sort by Name A-Z</option>
+                        <option value="name_desc">Sort by Name Z-A</option>
+                    </select>
+                    <button class="favorites-btn" id="favoritesBtn">
+                        <i class="fas fa-star"></i>
+                        <span>Favorites</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading" id="loadingState">
+                <div class="loader"></div>
+                <p>Loading cryptocurrency data...</p>
+            </div>
+
+            <!-- Error State -->
+            <div class="error-container" id="errorState">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Oops! Something went wrong</h3>
+                <p id="errorMessage">Failed to fetch data. Please try again.</p>
+                <button class="retry-btn" id="retryBtn">
+                    <i class="fas fa-redo"></i> Retry
+                </button>
+            </div>
+
+            <!-- Crypto Grid -->
+            <div class="crypto-grid" id="cryptoGrid">
+                <!-- Crypto cards will be dynamically inserted here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Crypto Details Modal -->
+    <div class="modal" id="cryptoModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-header">
+                <img src="" alt="" id="modalImage" class="modal-crypto-image">
+                <div class="modal-crypto-info">
+                    <h2 id="modalName">Bitcoin</h2>
+                    <span class="modal-symbol" id="modalSymbol">BTC</span>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-price-section">
+                    <span class="modal-price" id="modalPrice">$0.00</span>
+                    <span class="modal-price-change" id="modalPriceChange">0.00%</span>
+                </div>
+                
+                <!-- Price Chart -->
+                <div class="chart-container">
+                    <canvas id="priceChart"></canvas>
+                </div>
+
+                <div class="modal-stats">
+                    <div class="modal-stat">
+                        <span class="modal-stat-label">Market Cap</span>
+                        <span class="modal-stat-value" id="modalMarketCap">$0</span>
+                    </div>
+                    <div class="modal-stat">
+                        <span class="modal-stat-label">24h Volume</span>
+                        <span class="modal-stat-value" id="modalVolume">$0</span>
+                    </div>
+                    <div class="modal-stat">
+                        <span class="modal-stat-label">24h High</span>
+                        <span class="modal-stat-value" id="modalHigh">$0</span>
+                    </div>
+                    <div class="modal-stat">
+                        <span class="modal-stat-label">24h Low</span>
+                        <span class="modal-stat-value" id="modalLow">$0</span>
+                    </div>
+                    <div class="modal-stat">
+                        <span class="modal-stat-label">Circulating Supply</span>
+                        <span class="modal-stat-value" id="modalSupply">0</span>
+                    </div>
+                    <div class="modal-stat">
+                        <span class="modal-stat-label">All Time High</span>
+                        <span class="modal-stat-value" id="modalAth">$0</span>
+                    </div>
+                </div>
+
+                <button class="favorite-btn" id="modalFavoriteBtn">
+                    <i class="far fa-star"></i>
+                    <span>Add to Favorites</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Success!</span>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
